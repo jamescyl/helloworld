@@ -1,5 +1,10 @@
 pipeline {
     agent any  // Or use a Docker agent with Maven/Java for consistency
+    
+    options {
+        skipDefaultCheckout(true) // the repo is already mounted. No need Git checkout since you already have access to the repository files.
+    }
+    
     tools {
         maven 'Maven 3.9.12'  // Name of Maven installation in Jenkins Global Tools
         jdk   'OpenJDK-21'    // Name of JDK installation
