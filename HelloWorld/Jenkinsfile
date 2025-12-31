@@ -10,11 +10,11 @@ pipeline {
         jdk   'OpenJDK-21'    // Name of JDK installation
     }
     stages {
-        stage('Checkout') {
-            steps {
-                checkout scm
-            }
-        }
+       // stage('Checkout') {
+       //     steps {
+       //         checkout scm
+       //     }
+       // }
         stage('Build') {
             steps {
                 sh 'mvn clean compile'
