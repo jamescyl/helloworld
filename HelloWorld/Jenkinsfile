@@ -17,11 +17,29 @@ pipeline {
        // }
         stage('Build') {
             steps {
-				dir('/repo/helloworld') {
-                	sh 'mvn clean compile'
-                }
+//                	sh 'mvn clean compile'
+ 
+				// Work directly in the mounted directory
+                dir('/repo/helloworld') {
+                    sh '''
+                        echo "Working in mounted directory:"
+                        pwd
+                        ls -la
+                        
+                        # Check for pom.xml
+                        if [ -f "pom.xml" ]; then
+                            echo "Building from mounted directory..."
+                            mvn clean compile
+                        else
+                            echo "ERROR: No pom.xml found at:"
+                            find . -name "pom.xml" 2>/dev/null
+                            exit 1
+                        fi
+                    '''
+				}
             }
         }
+        
         stage('Test') {
             steps {
                 sh 'mvn test'
