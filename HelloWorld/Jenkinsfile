@@ -15,28 +15,48 @@ pipeline {
        //         checkout scm
        //     }
        // }
-        stage('Build') {
+ 		stage('Check Files') {
             steps {
-//                	sh 'mvn clean compile'
- 
-				// Work directly in the mounted directory
-                dir('/repo/helloworld') {
+                script {
+                    // Check what's in the mounted directory
                     sh '''
-                        echo "Working in mounted directory:"
+                        echo "=== Checking mounted repository ==="
+                        ls -la /repo/helloworld/
+                        echo "=== Looking for pom.xml ==="
+                        find /repo/helloworld -name "pom.xml" 2>/dev/null || echo "No pom.xml found"
+                    '''
+                }
+            }
+        }
+        
+        stage('Copy Files') {
+            steps {
+                script {
+                    // Copy ALL files from mounted repo to workspace
+                    sh '''
+                        echo "Current workspace:"
                         pwd
                         ls -la
                         
-                        # Check for pom.xml
+                        echo "Copying files from mounted repo..."
+                        cp -r /repo/helloworld/HelloWorld/pom.xml .
+                        echo "Files copied:"
+                        ls -la
+                        
+                        # Verify pom.xml exists
                         if [ -f "pom.xml" ]; then
-                            echo "Building from mounted directory..."
-                            mvn clean compile
+                            echo "Found pom.xml!"
+                            cat pom.xml | head -20
                         else
-                            echo "ERROR: No pom.xml found at:"
-                            find . -name "pom.xml" 2>/dev/null
-                            exit 1
+                            echo "ERROR: pom.xml not found!"
+                            find . -name "*.xml" 2>/dev/null
                         fi
                     '''
-				}
+                }
+            }
+               stage('Build') {
+            steps {
+               	sh 'mvn clean compile'
             }
         }
         
